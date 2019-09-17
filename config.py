@@ -1,7 +1,6 @@
 import argparse
 
 from torch.utils.data import random_split
-from torch.utils.data import Dataset
 import torch
 
 from dataloader import SpineDataset
@@ -14,9 +13,9 @@ DATA_PATH='C:/Research/LumbarSpine/RealSegmentationData/'
 
 H, W, D, C, O = 512, 512, 30, 1, 4
 BATCH_SIZE = 3
-NUM_EPOCHS = 5
+NUM_EPOCHS = 100
 LEARNING_RATE = 0.01
-LR_SCHEDULER_STEP = 50
+LR_SCHEDULER_STEP = 40
 LOG_STEP=1
 
 def argparser():
@@ -40,7 +39,7 @@ def argparser():
         torch.manual_seed(RANDOM_SEED)
 
     dataset_path =  DATA_PATH
-    trainset, validset, testset = random_split(SpineDataset(DATA_PATH), lengths=[20, 5, 5])
+    trainset, validset, testset = random_split(SpineDataset(dataset_path), lengths=[20, 5, 5])
 
     dataset = {
         'train': trainset,

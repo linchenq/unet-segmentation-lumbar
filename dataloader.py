@@ -1,10 +1,8 @@
 import os
 import hdf5storage
 import numpy as np
-import matplotlib.pyplot as plt
 
-import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 import config
     
