@@ -20,7 +20,7 @@ class Inference(object):
         self.model.to(self.device)
 
     def inference(self):
-        self.model.load_state_dict(torch.load(self.config.save_folder))
+        self.model.load_state_dict(torch.load(self.config.save_folder + "\model-unet.pth"))
         self.model.eval()
 
         x_test, y_test = next(iter(self.dataloader['test']))

@@ -58,11 +58,11 @@ class Trainer(object):
             print('{:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
         print("The best valid loss is {:4f}".format(self.best_valid_loss))
-        torch.save(self.model.state_dict(), self.config.save_folder)
+        torch.save(self.model.state_dict(), self.config.save_folder + "\model-unet.pth")
 
     def run_single_step(self, epoch):
         loss_train, loss_valid = [], []
-        
+
         for phase in ['train', 'valid']:
             if phase == 'train':
                 self.model.train()

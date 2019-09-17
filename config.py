@@ -7,7 +7,7 @@ from dataloader import SpineDataset
 from unet import UNet
 
 DEBUG_MODE = True
-RANDOM_SEED = 17
+RANDOM_SEED = 100
 
 DATA_PATH='C:/Research/LumbarSpine/RealSegmentationData/'
 
@@ -16,7 +16,7 @@ BATCH_SIZE = 3
 NUM_EPOCHS = 100
 LEARNING_RATE = 0.01
 LR_SCHEDULER_STEP = 40
-LOG_STEP=1
+LOG_STEP = 1
 
 def argparser():
     parser = argparse.ArgumentParser(description="U-Net for semantic segmentation")
@@ -30,7 +30,7 @@ def argparser():
 
     # log
     parser.add_argument("--log_folder", type=str, default="./SpineUNet_Logs")
-    parser.add_argument("--save_folder", type=str, default="./SpineUNet_Saves")
+    parser.add_argument("--save_folder", type=str, default="./SpineUNet_Saves/")
     parser.add_argument("--log_step", type=int, default=LOG_STEP)
 
     config = parser.parse_args(args=[])
