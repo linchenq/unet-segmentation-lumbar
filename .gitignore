@@ -1,0 +1,5 @@
+/dataset/
+/SpineUNet_Logs/
+/SpineUNet_Saves/
+/__pycache__/
+/.spyproject/

@@ -1,1 +1,1 @@
-"# LumbarSegmentation" 
+# LumbarSegmentation
