@@ -23,7 +23,6 @@ class Trainer(object):
         self.dataloader = {
             'train': DataLoader(self.dataset['train'], batch_size=self.config.batch_size, shuffle=True),
             'valid': DataLoader(self.dataset['valid'], batch_size=self.config.batch_size, shuffle=True),
-            'test': DataLoader(self.dataset['test'], batch_size=1, shuffle=True)
         }
 
         os.makedirs(self.config.log_folder, exist_ok=True)
@@ -59,6 +58,7 @@ class Trainer(object):
             print('{:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
         print("The best valid loss is {:4f}".format(self.best_valid_loss))
+        torch.save(self.model.state_dict(), self.config.save_folder)
 
     def run_single_step(self, epoch):
         loss_train, loss_valid = [], []
@@ -118,6 +118,7 @@ def main():
     trainer = Trainer(config, model, dataset)
 
     trainer.train()
+
 
 if __name__ == '__main__':
     main()
