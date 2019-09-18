@@ -5,6 +5,7 @@ import torch
 
 from dataloader import SpineDataset
 from unet import UNet
+from resnet_unet import ResNetUnet
 
 DEBUG_MODE = True
 RANDOM_SEED = 100
@@ -32,6 +33,7 @@ def argparser():
     parser.add_argument("--log_folder", type=str, default="./SpineUNet_Logs")
     parser.add_argument("--save_folder", type=str, default="./SpineUNet_Saves/")
     parser.add_argument("--log_step", type=int, default=LOG_STEP)
+    parser.add_argument("--model_name", type=str, default="resnet-unet")
 
     config = parser.parse_args(args=[])
 
@@ -49,7 +51,12 @@ def argparser():
 
     config.h, config.w, config.d, config.c, config.num_classes = H, W, D, C, O
 
-    model = UNet(in_channels=C, out_channels=O, init_features=32)
+    if config.model_name == "unet":
+        model = UNet(in_channels=C, out_channels=O, init_features=32)
+    elif config.model_name == "resnet-unet":
+        model = ResNetUnet(in_channels=C, out_channels=O, init_features=64)
+    else:
+        raise NotImplementedError
 
     return config, model, dataset
 

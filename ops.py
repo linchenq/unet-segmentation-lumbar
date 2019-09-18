@@ -22,10 +22,27 @@ class UNetBlock(nn.Module):
                         (name + "conv2_wo", nn.Conv2d(out_ch, out_ch, 3, padding=1)),
                         (name + "relu2_wo", nn.ReLU(inplace=True))
         ]))
-        
+
     def forward(self, input):
         if self.norm:
             return self.block(input)
         else:
             return self.block_wo_norm(input)
+
+class ResNetBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, model):
+        super(ResNetBlock, self).__init__()
+        self.model = model
+
+        self.conv1 = nn.Conv2d(in_ch, out_ch, kernel_size=7, stride=2, padding=3, bias=False)
+
+        self.encoder = nn.Sequential(
+                self.conv1,
+                self.model.bn1,
+                self.model.relu,
+        )
+
+    def forward(self, x):
+        return self.encoder(x)
+
 

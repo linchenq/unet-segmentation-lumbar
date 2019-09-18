@@ -6,7 +6,7 @@ from ops import UNetBlock
 
 class UNet(nn.Module):
 
-    def __init__(self, in_channels, out_channels, init_features=32):
+    def __init__(self, in_channels=1, out_channels=4, init_features=32):
         super(UNet, self).__init__()
 
         features = init_features
