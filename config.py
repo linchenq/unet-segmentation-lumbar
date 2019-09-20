@@ -55,6 +55,8 @@ def argparser():
 
     if config.model_name == "unet":
         model = UNet(in_channels=C, out_channels=O, init_features=32, maxpool=False)
+    # This specific performance shows that regarding this training set:
+    #      maxpooling > (better than) conv with stride=2
     elif config.model_name == "resnet_unet":
         model = ResNetUnet(in_channels=C, out_channels=O, init_features=64)
     elif config.model_name == "attention_unet":
