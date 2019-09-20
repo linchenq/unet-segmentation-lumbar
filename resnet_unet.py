@@ -82,7 +82,7 @@ class ResNetUnet(nn.Module):
 
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = ResNetUnet(in_channels=3)
+    model = ResNetUnet(in_channels=1)
     model = model.to(device)
 
     summary(model, input_size=(3, 512, 512))
