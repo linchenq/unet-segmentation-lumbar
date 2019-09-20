@@ -4,6 +4,8 @@ from torchsummary import summary
 
 from ops import NestedNetBlock
 
+# Evaluation is kind of bad
+
 class NestedUnet(nn.Module):
 
     def __init__(self, in_channels=1, out_channels=4, init_features=32):
