@@ -7,7 +7,10 @@ class UNetBlock(nn.Module):
     def __init__(self, in_ch, out_ch, name, norm=True):
         super(UNetBlock, self).__init__()
         self.norm = norm
-        
+
+        # receptive field : (n + 2p - k)/s + 1
+        # (n + 2 - 3)/1 + 1 = n
+
         self.block = nn.Sequential(OrderedDict([
                         (name + "conv1", nn.Conv2d(in_ch, out_ch, 3, padding=1, bias=False)),
                         (name + "norm1", nn.BatchNorm2d(out_ch)),

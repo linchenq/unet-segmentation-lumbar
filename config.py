@@ -35,7 +35,7 @@ def argparser():
     parser.add_argument("--log_folder", type=str, default="./SpineUNet_Logs")
     parser.add_argument("--save_folder", type=str, default="./SpineUNet_Saves/")
     parser.add_argument("--log_step", type=int, default=LOG_STEP)
-    parser.add_argument("--model_name", type=str, default="nested_net")
+    parser.add_argument("--model_name", type=str, default="unet")
 
     config = parser.parse_args(args=[])
 
@@ -54,7 +54,7 @@ def argparser():
     config.h, config.w, config.d, config.c, config.num_classes = H, W, D, C, O
 
     if config.model_name == "unet":
-        model = UNet(in_channels=C, out_channels=O, init_features=32)
+        model = UNet(in_channels=C, out_channels=O, init_features=32, maxpool=False)
     elif config.model_name == "resnet_unet":
         model = ResNetUnet(in_channels=C, out_channels=O, init_features=64)
     elif config.model_name == "attention_unet":

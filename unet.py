@@ -6,19 +6,24 @@ from ops import UNetBlock
 
 class UNet(nn.Module):
 
-    def __init__(self, in_channels=1, out_channels=4, init_features=32):
+    def __init__(self, in_channels=1, out_channels=4, init_features=32, maxpool=True):
         super(UNet, self).__init__()
 
+        self.maxpool = maxpool
         features = [init_features * i for i in [1, 2, 4, 8, 16]]
 
         self.encoder1 = UNetBlock(in_channels, features[0], name="enc1")
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool1_conv = nn.Conv2d(features[0], features[0], kernel_size=2, stride=2)
         self.encoder2 = UNetBlock(features[0], features[1], name="enc2")
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool2_conv = nn.Conv2d(features[1], features[1], kernel_size=2, stride=2)
         self.encoder3 = UNetBlock(features[1], features[2], name="enc3")
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool3_conv = nn.Conv2d(features[2], features[2], kernel_size=2, stride=2)
         self.encoder4 = UNetBlock(features[2], features[3], name="enc4")
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool4_conv = nn.Conv2d(features[3], features[3], kernel_size=2, stride=2)
 
         self.bottleneck = UNetBlock(features[3], features[4], name="bottleneck")
 
@@ -35,11 +40,19 @@ class UNet(nn.Module):
 
     def forward(self, x):
         enc1 = self.encoder1(x)
-        enc2 = self.encoder2(self.pool1(enc1))
-        enc3 = self.encoder3(self.pool2(enc2))
-        enc4 = self.encoder4(self.pool3(enc3))
+        if self.maxpool:
+            enc2 = self.encoder2(self.pool1(enc1))
+            enc3 = self.encoder3(self.pool2(enc2))
+            enc4 = self.encoder4(self.pool3(enc3))
 
-        bottleneck = self.bottleneck(self.pool4(enc4))
+            bottleneck = self.bottleneck(self.pool4(enc4))
+
+        else:
+            enc2 = self.encoder2(self.pool1_conv(enc1))
+            enc3 = self.encoder3(self.pool2_conv(enc2))
+            enc4 = self.encoder4(self.pool3_conv(enc3))
+
+            bottleneck = self.bottleneck(self.pool4_conv(enc4))
 
         dec4 = self.upconv4(bottleneck)
         dec4 = torch.cat((dec4, enc4), dim=1)
@@ -66,7 +79,7 @@ if __name__ == '__main__':
         from torch.autograd import Variable
         img = Variable(torch.rand(2, 1, 512, 512))
 
-        net = UNet()
+        net = UNet(maxpool=False)
         out = net(img)
 
         print(out.size())
