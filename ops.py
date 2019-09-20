@@ -72,13 +72,31 @@ class AttentionNetBlock(nn.Module):
         res = x * pis_res
         return res
 
+class NestedNetBlock(nn.Module):
+    def __init__(self, in_ch, mid_ch, out_ch, name):
+        super(NestedNetBlock, self).__init__()
+        self.block = nn.Sequential(OrderedDict([
+                        (name + "conv1", nn.Conv2d(in_ch, mid_ch, 3, padding=1, bias=False)),
+                        (name + "norm1", nn.BatchNorm2d(mid_ch)),
+                        (name + "relu1", nn.ReLU(inplace=True)),
+                        (name + "conv2", nn.Conv2d(mid_ch, out_ch, 3, padding=1, bias=False)),
+                        (name + "norm2", nn.BatchNorm2d(out_ch)),
+                        (name + "relu2", nn.ReLU(inplace=True))
+        ]))
+
+    def forward(self, input):
+        return self.block(input)
+
 if __name__ == '__main__':
     from torch.autograd import Variable
 
     img = Variable(torch.rand(2, 16, 32, 32))
-    gat = Variable(torch.rand(2, 16, 32, 32))
+    net = NestedNetBlock(16, 32, 32, "test")
+    out = net(img)
+    # img = Variable(torch.rand(2, 16, 32, 32))
+    # gat = Variable(torch.rand(2, 16, 32, 32))
 
-    net = AttentionNetBlock(F_g=16, F_l=16, F_int=8)
-    out = net(gat, img)
+    # net = AttentionNetBlock(F_g=16, F_l=16, F_int=8)
+    # out = net(gat, img)
 
     print(out.size())

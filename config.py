@@ -7,6 +7,7 @@ from dataloader import SpineDataset
 from unet import UNet
 from resnet_unet import ResNetUnet
 from attention_unet import AttentionUnet
+from nested_unet import NestedUnet
 
 DEBUG_MODE = True
 RANDOM_SEED = 100
@@ -34,7 +35,7 @@ def argparser():
     parser.add_argument("--log_folder", type=str, default="./SpineUNet_Logs")
     parser.add_argument("--save_folder", type=str, default="./SpineUNet_Saves/")
     parser.add_argument("--log_step", type=int, default=LOG_STEP)
-    parser.add_argument("--model_name", type=str, default="attention-unet")
+    parser.add_argument("--model_name", type=str, default="nested_net")
 
     config = parser.parse_args(args=[])
 
@@ -54,10 +55,12 @@ def argparser():
 
     if config.model_name == "unet":
         model = UNet(in_channels=C, out_channels=O, init_features=32)
-    elif config.model_name == "resnet-unet":
+    elif config.model_name == "resnet_unet":
         model = ResNetUnet(in_channels=C, out_channels=O, init_features=64)
-    elif config.model_name == "attention-unet":
+    elif config.model_name == "attention_unet":
         model = AttentionUnet(in_channels=C, out_channels=O, init_features=32)
+    elif config.model_name == "nested_net":
+        model = NestedUnet(in_channels=C, out_channels=O, init_features=32)
     else:
         raise NotImplementedError
 

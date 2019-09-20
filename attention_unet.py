@@ -9,40 +9,39 @@ class AttentionUnet(nn.Module):
     def __init__(self, in_channels=1, out_channels=4, init_features=32):
         super(AttentionUnet, self).__init__()
 
-        features = init_features
-        self.encoder1 = UNetBlock(in_channels, features, name="enc1")
+        features = [init_features * i for i in [1, 2, 4, 8, 16]]
+
+        self.encoder1 = UNetBlock(in_channels, features[0], name="enc1")
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.encoder2 = UNetBlock(features, features*2, name="enc2")
+        self.encoder2 = UNetBlock(features[0], features[1], name="enc2")
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.encoder3 = UNetBlock(features*2, features*4, name="enc3")
+        self.encoder3 = UNetBlock(features[1], features[2], name="enc3")
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.encoder4 = UNetBlock(features*4, features*8, name="enc4")
+        self.encoder4 = UNetBlock(features[2], features[3], name="enc4")
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.bottleneck = UNetBlock(features*8, features*16, name="bottleneck")
+        self.bottleneck = UNetBlock(features[3], features[4], name="bottleneck")
 
-        self.upconv4 = nn.ConvTranspose2d(features*16, features*8, kernel_size=2, stride=2)
-        self.att4 = AttentionNetBlock(F_g=features*8, F_l=features*8, F_int=features*4)
-        self.decoder4 = UNetBlock((features*8)*2, features*8, name="dec4")
+        self.upconv4 = nn.ConvTranspose2d(features[4], features[3], kernel_size=2, stride=2)
+        self.att4 = AttentionNetBlock(F_g=features[3], F_l=features[3], F_int=features[2])
+        self.decoder4 = UNetBlock((features[3])*2, features[3], name="dec4")
 
-        self.upconv3 = nn.ConvTranspose2d(features*8, features*4, kernel_size=2, stride=2)
-        self.att3 = AttentionNetBlock(F_g=features*4, F_l=features*4, F_int=features*2)
-        self.decoder3 = UNetBlock((features*4)*2, features*4, name="dec3")
+        self.upconv3 = nn.ConvTranspose2d(features[3], features[2], kernel_size=2, stride=2)
+        self.att3 = AttentionNetBlock(F_g=features[2], F_l=features[2], F_int=features[1])
+        self.decoder3 = UNetBlock((features[2])*2, features[2], name="dec3")
 
-        self.upconv2 = nn.ConvTranspose2d(features*4, features*2, kernel_size=2, stride=2)
-        self.att2 = AttentionNetBlock(F_g=features*2, F_l=features*2, F_int=features*1)
-        self.decoder2 = UNetBlock((features*2)*2, features*2, name="dec2")
+        self.upconv2 = nn.ConvTranspose2d(features[2], features[1], kernel_size=2, stride=2)
+        self.att2 = AttentionNetBlock(F_g=features[1], F_l=features[1], F_int=features[0])
+        self.decoder2 = UNetBlock((features[1])*2, features[1], name="dec2")
 
-        self.upconv1 = nn.ConvTranspose2d(features*2, features, kernel_size=2, stride=2)
-        self.att1 = AttentionNetBlock(F_g=features, F_l=features, F_int=features//2)
-        self.decoder1 = UNetBlock(features*2, features, name="dec1")
+        self.upconv1 = nn.ConvTranspose2d(features[1], features[0], kernel_size=2, stride=2)
+        self.att1 = AttentionNetBlock(F_g=features[0], F_l=features[0], F_int=features[0]//2)
+        self.decoder1 = UNetBlock(features[1], features[0], name="dec1")
 
-        self.conv = nn.Conv2d(
-            in_channels=features, out_channels=out_channels, kernel_size=1
-        )
+        self.conv = nn.Conv2d(in_channels=features[0], out_channels=out_channels, kernel_size=1)
 
     def forward(self, x):
         enc1 = self.encoder1(x)

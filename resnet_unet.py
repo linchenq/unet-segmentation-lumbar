@@ -10,10 +10,10 @@ class ResNetUnet(nn.Module):
     def __init__(self, in_channels=1, out_channels=4, init_features=64):
         super(ResNetUnet, self).__init__()
 
-        features = init_features
+        features = [init_features * i for i in [1, 2, 4, 8]]
         self.resnet = models.resnet34(pretrained=False)
 
-        self.unet_x = UNetBlock(in_channels, features, name="unet_x")
+        self.unet_x = UNetBlock(in_channels, features[0], name="unet_x")
 
         self.encoder0 = ResNetBlock(in_channels, init_features, self.resnet)    # init_features
         self.pool1 = self.resnet.maxpool
@@ -22,31 +22,19 @@ class ResNetUnet(nn.Module):
         self.encoder3 = self.resnet.layer3          #init_features*4
         self.encoder4 = self.resnet.layer4          #init_features*8
 
-        self.bottleneck = UNetBlock(features*8, features*8, name="bottleneck")
+        self.bottleneck = UNetBlock(features[3], features[3], name="bottleneck")
 
-        self.upconv4 = nn.ConvTranspose2d(
-            features*8, features*4, kernel_size=2, stride=2
-        )
-        self.decoder4 = UNetBlock((features*4 + features*4), features*8, name="dec4")
-        self.upconv3 = nn.ConvTranspose2d(
-            features*8, features*4, kernel_size=2, stride=2
-        )
-        self.decoder3 = UNetBlock((features*4 + features*2), features*4, name="dec3")
-        self.upconv2 = nn.ConvTranspose2d(
-            features*4, features*2, kernel_size=2, stride=2
-        )
-        self.decoder2 = UNetBlock((features*2 + features*1), features*2, name="dec2")
-        self.upconv1 = nn.ConvTranspose2d(
-            features*2, features, kernel_size=2, stride=2
-        )
-        self.decoder1 = UNetBlock((features*1 + features*1), features*1, name="dec1")
-        self.upconv0 = nn.ConvTranspose2d(
-            features, features//2, kernel_size=2, stride=2
-        )
-        self.decoder0 = UNetBlock((features//2 + features*1), features, name="dec0")
-        self.conv = nn.Conv2d(
-            in_channels=features, out_channels=out_channels, kernel_size=1
-        )
+        self.upconv4 = nn.ConvTranspose2d(features[3], features[2], kernel_size=2, stride=2)
+        self.decoder4 = UNetBlock((features[2] + features[2]), features[3], name="dec4")
+        self.upconv3 = nn.ConvTranspose2d(features[3], features[2], kernel_size=2, stride=2)
+        self.decoder3 = UNetBlock((features[2] + features[1]), features[2], name="dec3")
+        self.upconv2 = nn.ConvTranspose2d(features[2], features[1], kernel_size=2, stride=2)
+        self.decoder2 = UNetBlock((features[1] + features[0]), features[1], name="dec2")
+        self.upconv1 = nn.ConvTranspose2d(features[1], features[0], kernel_size=2, stride=2)
+        self.decoder1 = UNetBlock((features[0] + features[0]), features[0], name="dec1")
+        self.upconv0 = nn.ConvTranspose2d(features[0], features[0]//2, kernel_size=2, stride=2)
+        self.decoder0 = UNetBlock((features[0]//2 + features[0]), features[0], name="dec0")
+        self.conv = nn.Conv2d(in_channels=features[0], out_channels=out_channels, kernel_size=1)
 
     def forward(self, x):
         unet0 = self.unet_x(x)
@@ -85,4 +73,13 @@ if __name__ == '__main__':
     model = ResNetUnet(in_channels=1)
     model = model.to(device)
 
-    summary(model, input_size=(3, 512, 512))
+    summary(model, input_size=(1, 512, 512))
+
+    if True:
+        from torch.autograd import Variable
+        img = Variable(torch.rand(2, 1, 512, 512))
+
+        net = ResNetUnet()
+        out = net(img)
+
+        print(out.size())
