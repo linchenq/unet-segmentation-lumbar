@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from config import argparser
+from utils import dice_coeff
 
 class Inference(object):
 
@@ -31,22 +32,18 @@ class Inference(object):
         y_pred = y_pred.data.cpu().numpy()
         
         print(y_pred.shape)
-        
+
         fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(15,15))
         axs.imshow(x_test.data.cpu().numpy()[0, 0])
-    
-        fig, axs = plt.subplots(nrows=1, ncols=4, figsize=(15,15))
-        axs[0].imshow(y_test.data.cpu().numpy()[0, 0])
-        axs[1].imshow(y_test.data.cpu().numpy()[0, 1])
-        axs[2].imshow(y_test.data.cpu().numpy()[0, 2])
-        axs[3].imshow(y_test.data.cpu().numpy()[0, 3])
-    
-        fig, axs = plt.subplots(nrows=1, ncols=4, figsize=(15,15))
-        axs[0].imshow(y_pred[0, 0])
-        axs[1].imshow(y_pred[0, 1])
-        axs[2].imshow(y_pred[0, 2])
-        axs[3].imshow(y_pred[0, 3])
 
+        for i in range(0, 4):
+            # fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(15,15))
+            fig, axs = plt.subplots(nrows=1, ncols=2)
+            axs[0].imshow(y_test.data.cpu().numpy()[0, i])
+            axs[1].imshow(y_pred[0, i])
+
+            score = dice_coeff(y_test.data.cpu().numpy()[0, i], y_pred[0, i])
+            fig.suptitle('the dice score is {:6f}'.format(score), va='bottom')
 
 
 def main():

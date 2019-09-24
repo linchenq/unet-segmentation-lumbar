@@ -9,12 +9,12 @@ class UNetLoss(nn.Module):
 
     def dice_loss(self, y_pred, y_true, metrics):
         loss = _dice_loss(y_pred, y_true, self.smooth)
-        metrics['dice_loss'] += loss.data.cpu().numpy()
+        metrics['dice_loss'] += loss.data.cpu().numpy() * y_true.size(0)
         return loss
 
     def bce_loss(self, y_pred, y_true, metrics):
         loss = _bce_loss(y_pred, y_true, self.smooth)
-        metrics['bce_loss'] += loss.data.cpu().numpy()
+        metrics['bce_loss'] += loss.data.cpu().numpy() * y_true.size(0)
         return loss
 
     def bce_dice_loss(self, y_pred, y_true, metrics):
@@ -23,7 +23,7 @@ class UNetLoss(nn.Module):
         dice = self.dice_loss(y_pred, y_true, metrics)
         bce = self.bce_loss(y_pred, y_true, metrics)
         loss = bce_weight * bce + (1. - bce_weight) * dice
-        metrics['bce_dice_loss'] = loss.data.cpu().numpy()
+        metrics['bce_dice_loss'] = loss.data.cpu().numpy() * y_true.size(0)
 
         return loss
 
