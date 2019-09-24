@@ -32,8 +32,8 @@ def argparser():
     parser.add_argument("--device", type=str, default="cuda")
 
     # log
-    parser.add_argument("--log_folder", type=str, default="./SpineUNet_Logs")
-    parser.add_argument("--save_folder", type=str, default="./SpineUNet_Saves/")
+    parser.add_argument("--log_folder", type=str, default="./logs")
+    parser.add_argument("--save_folder", type=str, default="./saves")
     parser.add_argument("--log_step", type=int, default=LOG_STEP)
     parser.add_argument("--model_name", type=str, default="unet")
 
@@ -67,31 +67,3 @@ def argparser():
         raise NotImplementedError
 
     return config, model, dataset
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    return args
