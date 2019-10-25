@@ -8,11 +8,12 @@ from tqdm import tqdm
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 
 from utils.config import argparser
 from utils.loss import UNetLoss
 from utils.utils import print_metrics
+from utils.logger import Logger
 
 class Trainer(object):
 
@@ -40,6 +41,8 @@ class Trainer(object):
         self.exp_lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.config.lr_scheduler_step, gamma=0.1)
 
         self.model.to(self.device)
+
+        self.logger = Logger(self.config.log_folder)
 
     def train(self):
         num_epochs = self.config.epochs
@@ -105,11 +108,13 @@ class Trainer(object):
 
             # tensorboard            
             if phase == 'train':
-                writer = SummaryWriter(log_dir=self.config.log_folder)
-                writer.add_scalar('Loss/train', np.mean(loss_train), epoch)
+                # writer = SummaryWriter(log_dir=self.config.log_folder)
+                # writer.add_scalar('Loss/train', np.mean(loss_train), epoch)
+                self.logger.scalar_summary('Loss/train', np.mean(loss_train), epoch)
             else:
-                writer = SummaryWriter(log_dir=self.config.log_folder)
-                writer.add_scalar('Loss/valid', np.mean(loss_valid), epoch)
+                # writer = SummaryWriter(log_dir=self.config.log_folder)
+                # writer.add_scalar('Loss/valid', np.mean(loss_valid), epoch)
+                self.logger.scalar_summary('Loss/valid', np.mean(loss_valid), epoch)
 
                 if epoch_loss < self.best_valid_loss:
                     print('saving best model with {:4f} better than {:4f}'.format(epoch_loss, self.best_valid_loss))
