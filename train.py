@@ -3,15 +3,16 @@ import numpy as np
 import copy
 import time
 from collections import defaultdict
+from tqdm import tqdm
 
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-from config import argparser
-from loss import UNetLoss
-from utils import print_metrics
+from utils.config import argparser
+from utils.loss import UNetLoss
+from utils.utils import print_metrics
 
 class Trainer(object):
 
@@ -72,7 +73,11 @@ class Trainer(object):
             metrics = defaultdict(float)
             samples = 0
             
-            for _, sample_batch in enumerate(self.dataloader[phase]):
+            for batch_i, sample_batch in enumerate(self.dataloader[phase]):
+                log_str = "---- [Phase %s][Epoch %d/%d, Batch %d/%d] ----"% \
+                        (phase, epoch, self.config.epochs, batch_i, len(self.dataloader[phase]))
+                print(log_str)
+
                 x, y_true = sample_batch
                 x, y_true = x.float(), y_true.float()
                 x, y_true = x.to(self.device), y_true.to(self.device)
@@ -95,9 +100,9 @@ class Trainer(object):
 
                 samples += x.size(0)
 
-            print_metrics(metrics, samples, phase)
+            print_metrics(metrics, samples, phase, epoch)
             epoch_loss = metrics['loss'] / samples
-            
+
             # tensorboard            
             if phase == 'train':
                 writer = SummaryWriter(log_dir=self.config.log_folder)
@@ -110,6 +115,9 @@ class Trainer(object):
                     print('saving best model with {:4f} better than {:4f}'.format(epoch_loss, self.best_valid_loss))
                     self.best_valid_loss = epoch_loss
                     self.best_model_wts = copy.deepcopy(self.model.state_dict())
+
+                if epoch % self.config.save_step == 0:
+                    torch.save(self.model.state_dict(), self.config.save_folder + "\model-unet-epo{}.pth".format(epoch))
 
 
 def main():

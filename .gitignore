@@ -1,5 +1,9 @@
-/dataset/
-/logs/
-/saves/
-/__pycache__/
-/.spyproject/
+# model save/log
+logs
+saves
+
+# pycache
+__pycache__
+
+# spyder IDE
+.spyproject

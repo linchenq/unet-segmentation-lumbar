@@ -1,0 +1,3 @@
+C:/Research/LumbarSpine/OriginalData/RealSegmentationData/SegData_P13.mat
+C:/Research/LumbarSpine/OriginalData/RealSegmentationData/SegData_P16.mat
+C:/Research/LumbarSpine/OriginalData/RealSegmentationData/SegData_P23.mat
