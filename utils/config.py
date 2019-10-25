@@ -24,7 +24,7 @@ OUTPUT_CHANNELS = ['DSegMap', 'VSegMap', 'BgSegMap', 'OtherSegMap']
 D = 1890
 
 # TRAINING SET
-BATCH_SIZE = 3
+BATCH_SIZE = 2
 
 NUM_EPOCHS = 150
 

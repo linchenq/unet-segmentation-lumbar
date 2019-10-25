@@ -1,5 +1,5 @@
 import torch.nn as nn
-
+import torch.nn.functional as F
 
 class UNetLoss(nn.Module):
 
@@ -8,6 +8,7 @@ class UNetLoss(nn.Module):
         self.smooth = 1.0
 
     def dice_loss(self, y_pred, y_true, metrics):
+        # y_pred = F.sigmoid(y_pred)
         loss = _dice_loss(y_pred, y_true, self.smooth)
         metrics['dice_loss'] += loss.data.cpu().numpy() * y_true.size(0)
         return loss
@@ -19,9 +20,8 @@ class UNetLoss(nn.Module):
 
     def bce_dice_loss(self, y_pred, y_true, metrics):
         bce_weight = 0.5
-
-        dice = self.dice_loss(y_pred, y_true, metrics)
         bce = self.bce_loss(y_pred, y_true, metrics)
+        dice = self.dice_loss(y_pred, y_true, metrics)
         loss = bce_weight * bce + (1. - bce_weight) * dice
         metrics['bce_dice_loss'] = loss.data.cpu().numpy() * y_true.size(0)
 
